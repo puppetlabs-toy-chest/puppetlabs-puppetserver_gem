@@ -1,0 +1,4 @@
+.vagrant
+.bundle/
+log/
+Gemfile.lock
