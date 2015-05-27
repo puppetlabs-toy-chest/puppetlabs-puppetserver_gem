@@ -15,7 +15,7 @@ describe 'installing a gem with the pe_puppetserver_gem provider' do
   end
 
   it 'should successfully install the desired gem' do
-    shell("/usr/bin/puppetserver gem list | grep hocon", :acceptable_exit_codes => 0)
+    shell("/opt/puppetlabs/bin/puppetserver gem list | grep hocon", :acceptable_exit_codes => 0)
   end
 end
 
@@ -34,6 +34,6 @@ describe 'removing a gem with the pe_puppetserver_gem provider' do
   end
 
   it 'should successfully remove the desired gem' do
-    shell("/usr/bin/puppetserver gem list | grep hocon", :acceptable_exit_codes => 1)
+    shell("/opt/puppetlabs/bin/puppetserver gem list | grep hocon", :acceptable_exit_codes => 1)
   end
 end

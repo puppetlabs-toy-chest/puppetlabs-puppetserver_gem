@@ -11,7 +11,7 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
 
   has_feature :versionable
 
-  commands :puppetservercmd => "/usr/bin/puppetserver" 
+  commands :puppetservercmd => "/opt/puppetlabs/bin/puppetserver" 
 
   def self.gemlist(options)
     gem_list_command = [command(:puppetservercmd), "gem", "list"]
