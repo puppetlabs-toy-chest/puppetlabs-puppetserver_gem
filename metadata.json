@@ -1,6 +1,6 @@
 {
   "name": "puppetlabs-puppetserver_gem",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "author": "Puppet Labs",
   "summary": "Puppet Labs Puppetserver Gem Module",
   "license": "Licensed under (Apache 2.0)",
