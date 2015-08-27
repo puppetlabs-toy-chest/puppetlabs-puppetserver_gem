@@ -12,7 +12,7 @@
 
 ##Overview
 
-This module provides management of Ruby gems for both PE and FOSS Puppet Server.
+This module provides management of Ruby gems for both PE and FOSS Puppet Server. It supercedes the deprecated pe_puppetserver_gem.
 
 ##Setup
 
