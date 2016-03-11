@@ -9,7 +9,7 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
     source is not present at all, the gem will be installed from the default gem
     repositories."
 
-  has_feature :versionable
+  has_feature :versionable, :install_options, :uninstall_options
 
   commands :puppetservercmd => "/opt/puppetlabs/bin/puppetserver" 
 
