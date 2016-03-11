@@ -1,3 +1,7 @@
+## 0.2.0
+### Features:
+This adds the ability to use install & uninstall options as in the parent provider.
+
 ## 2015-05-28 - 0.1.0
 ### Summary:
 This module provides management of Ruby gems on puppet. This is the initial release 
