@@ -1,8 +1,23 @@
-## 0.2.0
+# Change Log
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](http://keepachangelog.com/)
+and this project adheres to [Semantic Versioning](http://semver.org/).
+
+## [1.0.0]
+### Summary
+This is the first officially stable release of puppetserver\_gem. This is a
+bugfix release and no backwards-incompatible changes have been made.
+
+### Fixed
+- MODULES-4815 Make `install_options` come before `source` to allow flags such
+  as `--clear-sources` to work.
+
+## [0.2.0]
 ### Features:
 This adds the ability to use install & uninstall options as in the parent provider.
 
-## 2015-05-28 - 0.1.0
+## 0.1.0 - 2015-05-28
 ### Summary:
 This module provides management of Ruby gems on puppet. This is the initial release 
 of the puppetserver_gem it supersedes the module pe_puppetserver_gem. This module 
@@ -17,3 +32,6 @@ apt-get install puppetserver
 optional, make sure that the puppetserver_gem is in the correct place
   cp -r /etc/puppet/modules/puppetserver_gem /etc/puppetlabs/code/environments/production/modules/
 /opt/puppetlabs/bin/puppet apply apply_manifest.pp.****  
+
+[1.0.0]: https://github.com/puppetlabs/puppetlabs-puppetserver_gem/compare/0.2.0...1.0.0
+[0.2.0]: https://github.com/puppetlabs/puppetlabs-puppetserver_gem/compare/0.1.0...0.2.0
