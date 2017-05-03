@@ -27,7 +27,7 @@ To install a gem from RubyGems into Puppet Server:
 ##Usage
 
 ###To add the 'json' gem from the default gem sources:
-By default there is one gem source which is https://rubgems.org
+By default there is one gem source which is https://rubygems.org
 
     package { 'json':
       ensure   => present,
@@ -40,9 +40,8 @@ By default there is one gem source which is https://rubgems.org
       ensure   => absent,
       provider => puppetserver_gem,
     }
-    
-This is equivalent to the command line:
-    puppetserver gem install --no-rdoc --no-ri json
+
+This is equivalent to the command line: `puppetserver gem install --no-rdoc --no-ri json`
 
 ###To add a specifc version of a gem from a specific gem repository without first checking the default gem sources:
 
@@ -53,15 +52,13 @@ This is equivalent to the command line:
       source          => "https://some-gem-repo.org",
     }
 
-    This is equivalent to the command line:
-      puppetserver gem install -v 1.2 --clear-sources --no-document --source https://some-gem-repo.org mygem
-
+This is equivalent to the command line: `puppetserver gem install -v 1.2 --clear-sources --no-document --source https://some-gem-repo.org mygem`
 
 ##Reference
 
 ##Limitations
 
-This module has been tested on PE and FOSS, and no issues have been identified. It is a wrapper around the command line, and so has the same limitations around [Gems with native (C) extensions](https://docs.puppet.com/puppetserver/latest/gems.html#gems-with-native-c-extensions)
+This module has been tested on PE and FOSS, and no issues have been identified. It is a wrapper around the `puppetserver gem` command line, and so has the same limitations around [Gems with native (C) extensions](https://docs.puppet.com/puppetserver/latest/gems.html#gems-with-native-c-extensions)
 
 ##Development
 
