@@ -13,7 +13,12 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
 
   has_feature :versionable, :install_options, :uninstall_options
 
-  commands :puppetservercmd => "/opt/puppetlabs/bin/puppetserver" 
+  commands :puppetservercmd => "/opt/puppetlabs/bin/puppetserver"
+
+  # the HOME variable is lost to the puppetserver script and needs to be
+  # injected directly into the call to `execute()`
+  CMD_ENV = {:custom_environment => {:HOME => ENV['HOME']}}
+
 
   def self.gemlist(options)
     gem_list_command = [command(:puppetservercmd), "gem", "list"]
@@ -31,7 +36,7 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
     end
 
     begin
-      list = execute(gem_list_command).lines.
+      list = execute(gem_list_command, CMD_ENV).lines.
           map {|set| gemsplit(set) }.
           reject {|x| x.nil? }
     rescue Puppet::ExecutionFailure => detail
@@ -74,7 +79,7 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
       command << "--no-rdoc" << "--no-ri" << resource[:name]
     end
 
-    output = execute(command)
+    output = execute(command, CMD_ENV)
     # Apparently some stupid gem versions don't exit non-0 on failure
     self.fail "Could not install: #{output.chomp}" if output.include?("ERROR")
   end
@@ -83,7 +88,7 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
     command = [command(:puppetservercmd), "gem", "uninstall"]
     command << "-x" << "-a" << resource[:name]
 
-    output = execute(command)
+    output = execute(command, CMD_ENV)
     self.fail "Could not uninstall: #{output.chomp}" if output.include?("ERROR")
   end
 end

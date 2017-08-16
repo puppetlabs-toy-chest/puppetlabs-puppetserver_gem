@@ -56,6 +56,15 @@ This is equivalent to the command line: `puppetserver gem install -v 1.2 --clear
 
 ##Reference
 
+###Proxy support
+Proxy servers are supported via through the `.gemrc` file which is normally
+present at `/root/.gemrc`:
+
+```
+http_proxy: http://proxy.megacorp.com:8888
+https_proxy: http://proxy.megacorp.com:8888
+```
+
 ##Limitations
 
 This module has been tested on PE and FOSS, and no issues have been identified. It is a wrapper around the `puppetserver gem` command line, and so has the same limitations around [Gems with native (C) extensions](https://docs.puppet.com/puppetserver/latest/gems.html#gems-with-native-c-extensions)
@@ -70,4 +79,4 @@ For more information, see our [module contribution guide.](https://docs.puppetla
 
 ## Testing
 
-At the minute, there is only an acceptance test for FOSS Puppet Server. 
+At the minute, there is only an acceptance test for FOSS Puppet Server.
