@@ -17,7 +17,7 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
 
   # the HOME variable is lost to the puppetserver script and needs to be
   # injected directly into the call to `execute()`
-  CMD_ENV = {:custom_environment => {:HOME => ENV['HOME']}}
+  CMD_ENV = {:custom_environment => {"HOME"=>ENV["HOME"]}}
 
 
   def self.gemlist(options)
