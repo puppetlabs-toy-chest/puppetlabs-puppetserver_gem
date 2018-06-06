@@ -36,9 +36,11 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
     end
 
     begin
+      # when `/tmp` mounted `noexec`, `puppetserver gem list` will output *** LOCAL GEMS ***
+      # and blank lines as if it was being run interactively
       list = execute(gem_list_command, CMD_ENV).lines.
-          map {|set| gemsplit(set) }.
-          reject {|x| x.nil? }
+	      reject {|x| x.nil? or x =~ /^\s*$/ or x =~ /\*\*\* LOCAL GEMS \*\*\*/ }.
+	      map {|set| gemsplit(set) }
     rescue Puppet::ExecutionFailure => detail
       raise Puppet::Error, "Could not list gems: #{detail}", detail.backtrace
     end
