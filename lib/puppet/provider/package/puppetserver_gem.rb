@@ -1,5 +1,4 @@
 require 'facter'
-require 'hocon'
 require 'rubygems/commands/list_command'
 require 'puppet/provider/package'
 require 'stringio'
@@ -17,6 +16,7 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
 
   has_feature :versionable, :install_options, :uninstall_options
 
+  confine :feature => :hocon
   commands :puppetservercmd => '/opt/puppetlabs/bin/puppetserver'
 
   # The HOME variable is lost to the puppetserver script 
