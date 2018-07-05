@@ -1,13 +1,23 @@
+---
 HOSTS:
-  ubuntu-server-1404-x64:
+  masterblaster:
+    pe_dir: http://neptune.puppetlabs.lan/2017.3/ci-ready
+    pe_ver:
+    pe_upgrade_dir:
+    pe_upgrade_ver:
+    hypervisor: vmpooler
+#    hypervisor: none
+#    ip: xxx.delivery.puppetlabs.net
+    platform: el-7-x86_64
+    template: centos-7-x86_64
     roles:
-      - master
-      - database
-      - dashboard
-    platform: ubuntu-14.04-amd64
-    box : puppetlabs/ubuntu-14.04-64-nocm
-    box_url : https://vagrantcloud.com/puppetlabs/ubuntu-14.04-64-nocm
-    hypervisor : vagrant
+    - agent
+    - master
+    - database
+    - dashboard
 CONFIG:
-  log_level   : debug
-  type: git
+  nfs_server: none
+  consoleport: 443
+  pooling_api: http://vmpooler.delivery.puppetlabs.net/
+  ssh:
+    keys: "~/.ssh/id_rsa-acceptance"

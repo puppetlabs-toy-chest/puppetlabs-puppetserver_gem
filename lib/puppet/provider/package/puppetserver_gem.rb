@@ -19,7 +19,7 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
   confine :feature => :hocon
   commands :puppetservercmd => '/opt/puppetlabs/bin/puppetserver'
 
-  # The HOME variable is lost to the puppetserver script 
+  # The HOME variable is lost to the puppetserver script
   #  and needs to be injected directly into the call to `execute()`
   # When doing so, restore :failonfail and :combine to their defaults
   #  as per the documentation in lib/puppet/util/execution.rb
