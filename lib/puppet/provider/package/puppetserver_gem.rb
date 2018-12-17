@@ -9,21 +9,25 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
   desc "Puppet Server Ruby Gem support. If a URL is passed via `source`, then
     that URL is appended to the list of remote gem repositories which by default
     contains rubygems.org; To ensure that only the specified source is used also
-    pass `--clear-sources` in via `install_options`; if a source is present but is
-    not a valid URL, it will be interpreted as the path to a local gem file.  If
-    source is not present at all, the gem will be installed from the default gem
-    repositories."
+    pass `--clear-sources` in via `install_options`; if a source is present but
+    is not a valid URL, it will be interpreted as the path to a local gem file.
+    If source is not present at all, the gem will be installed from the default
+    gem repositories."
 
   has_feature :versionable, :install_options, :uninstall_options
 
   confine :feature => :hocon
   commands :puppetservercmd => '/opt/puppetlabs/bin/puppetserver'
 
-  # The HOME variable is lost to the puppetserver script
-  #  and needs to be injected directly into the call to `execute()`
-  # When doing so, restore :failonfail and :combine to their defaults
-  #  as per the documentation in lib/puppet/util/execution.rb
-  EXEC_OPTS = { :failonfail => true, :combine => true, :custom_environment => { :HOME => ENV['HOME'] } }
+  # The HOME variable is lost to the puppetserver script,
+  # and needs to be injected directly into the call to `execute()`
+  # When doing so, restore :failonfail and :combine to their defaults,
+  # as per the documentation in lib/puppet/util/execution.rb
+  EXEC_OPTS = {
+    :failonfail         => true,
+    :combine            => true,
+    :custom_environment => { :HOME => ENV['HOME'] }
+  }.freeze
 
   def self.gemlist(options)
     gem_list_command = [command(:puppetservercmd), 'gem', 'list']
@@ -53,8 +57,10 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
       end
     end
 
-    # When `/tmp` is mounted `noexec`, `puppetserver gem list` will output *** LOCAL GEMS ***
-    #  causing gemsplit to output: Warning: Could not match *** LOCAL GEMS ***
+    # When `/tmp` is mounted `noexec`, `puppetserver gem list` will output:
+    # *** LOCAL GEMS ***
+    # causing gemsplit to output:
+    # Warning: Could not match *** LOCAL GEMS ***
     gem_list = list
                .lines
                .select { |x| x =~ /^(\S+)\s+\((.+)\)/ }
@@ -67,25 +73,24 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
     end
   end
 
-  # The puppetserver gem cli command is very slow, since it has to start a JVM.
+  # The puppetserver gem cli command is very slow, since it starts a JVM.
   #
   # Instead, for the list subcommand (which is executed with every puppet run),
-  # use the rubygems library from the puppet ruby: setting GEM_HOME and GEM_PATH
+  # use the rubygems library from puppet ruby: setting GEM_HOME and GEM_PATH
   # to the default values, or the values in the puppetserver configuration file.
   #
-  # The rubygems library cannot access java platform gems, for example: json (1.8.3 java),
-  # but java platform gems should not be managed (by design) by this or any provider.
-  #
-  # https://github.com/puppetlabs/puppetserver/blob/master/resources/ext/config/conf.d/puppetserver.conf
+  # The rubygems library cannot access java platform gems,
+  # for example: json (1.8.3 java)
+  # but java platform gems should not be managed by this (or any) provider.
 
   def self.execute_rubygems_list_command(gem_regex)
-    pe_puppetserver_conf_file        = '/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf'
-    os_puppetserver_conf_file        = '/etc/puppetlabs/puppetserver/puppetserver.conf'
     puppetserver_gem_home            = '/opt/puppetlabs/server/data/puppetserver/jruby-gems'
     puppetserver_vendored_jruby_gems = '/opt/puppetlabs/server/data/puppetserver/vendored-jruby-gems'
     puppet_vendored_gems             = '/opt/puppetlabs/puppet/lib/ruby/vendor_gems'
-
     puppetserver_gem_path = [puppetserver_gem_home, puppetserver_vendored_jruby_gems, puppet_vendored_gems]
+
+    pe_puppetserver_conf_file = '/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf'
+    os_puppetserver_conf_file = '/etc/puppetlabs/puppetserver/puppetserver.conf'
     puppetserver_conf_file = Facter.value(:pe_server_version) ? pe_puppetserver_conf_file : os_puppetserver_conf_file
     puppetserver_conf = Hocon.load(puppetserver_conf_file)
 
@@ -110,12 +115,9 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
     gem_list_cmd.ui = stream_ui
     gem_list_cmd.execute
 
-    # Remove default gems from the list, as they are the default gems from the puppet ruby,
-    # for example: /opt/puppetlabs/puppet/lib/ruby/gems/x.y.z/specifications/default
-    #
-    # There is no method exclude default gems from the local gem list, for example: psych (default: 2.2.2),
-    # but default gems should not be managed (by design) by this or any provider.
-
+    # There is no method exclude default gems from the local gem list,
+    # for example: psych (default: 2.2.2)
+    # but default gems should not be managed by this (or any) provider.
     gem_list = sio_out.string.lines.reject { |gem| gem =~ / \(default\: / }
     gem_list.join("\n")
   ensure

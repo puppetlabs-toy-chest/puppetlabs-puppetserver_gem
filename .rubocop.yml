@@ -1,0 +1,13 @@
+---
+Metrics/LineLength:
+  Max: 255
+Metrics/BlockLength:
+  Max: 48
+Metrics/MethodLength:
+  Max: 32
+Style/GuardClause:
+  Enabled: false
+Style/HashSyntax:
+  Enabled: false
+Style/SpecialGlobalVars:
+  Enabled: false

@@ -15,10 +15,10 @@ RSpec.configure do |c|
   c.before :suite do
     unless ENV['BEAKER_TESTMODE'] == 'local'
       unless ENV['BEAKER_provision'] == 'no'
-
+        # intentionally blank
       end
       hosts.each do |host|
-
+        # intentionally blank
       end
     end
   end
