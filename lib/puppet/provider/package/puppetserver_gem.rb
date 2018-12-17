@@ -67,19 +67,28 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
     end
   end
 
-  # The puppetserver gem cli commands are particularly slow as they start a JVM.
-  # Instead, for the often-executed list command, use the rubygems library from the puppet ruby,
-  #  setting the GEM_HOME and GEM_PATH to the values in the puppetserver configuration file.
-  # The rubygems library does not have access to java platform gems, for example: json (1.8.3 java),
-  #  but java platform gems should not be managed, by design.
+  # The puppetserver gem cli command is very slow, since it has to start a JVM.
+  #
+  # Instead, for the list subcommand (which is executed with every puppet run),
+  # use the rubygems library from the puppet ruby: setting GEM_HOME and GEM_PATH
+  # to the default values, or the values in the puppetserver configuration file.
+  #
+  # The rubygems library cannot access java platform gems, for example: json (1.8.3 java),
+  # but java platform gems should not be managed (by design) by this or any provider.
+  #
+  # https://github.com/puppetlabs/puppetserver/blob/master/resources/ext/config/conf.d/puppetserver.conf
 
   def self.execute_rubygems_list_command(gem_regex)
-    pe_puppetserver_conf_file = '/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf'
-    os_puppetserver_conf_file = '/etc/puppetlabs/puppetserver/puppetserver.conf'
-    puppetserver_gem_home = '/opt/puppetlabs/server/data/puppetserver/jruby-gems'
-    puppetserver_gem_path = [puppetserver_gem_home, '/opt/puppetlabs/server/data/puppetserver/vendored-jruby-gems']
+    pe_puppetserver_conf_file        = '/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf'
+    os_puppetserver_conf_file        = '/etc/puppetlabs/puppetserver/puppetserver.conf'
+    puppetserver_gem_home            = '/opt/puppetlabs/server/data/puppetserver/jruby-gems'
+    puppetserver_vendored_jruby_gems = '/opt/puppetlabs/server/data/puppetserver/vendored-jruby-gems'
+    puppet_vendored_gems             = '/opt/puppetlabs/puppet/lib/ruby/vendor_gems'
+
+    puppetserver_gem_path = [puppetserver_gem_home, puppetserver_vendored_jruby_gems, puppet_vendored_gems]
     puppetserver_conf_file = Facter.value(:pe_server_version) ? pe_puppetserver_conf_file : os_puppetserver_conf_file
     puppetserver_conf = Hocon.load(puppetserver_conf_file)
+
     gem_env = {}
     if puppetserver_conf.empty?
       gem_env['GEM_HOME'] = puppetserver_gem_home
@@ -101,10 +110,12 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
     gem_list_cmd.ui = stream_ui
     gem_list_cmd.execute
 
-    # Remove default gems from the list, as the are the default gems from the puppet ruby:
-    #  /opt/puppetlabs/puppet/lib/ruby/gems/x.y.z/specifications/default
+    # Remove default gems from the list, as they are the default gems from the puppet ruby,
+    # for example: /opt/puppetlabs/puppet/lib/ruby/gems/x.y.z/specifications/default
+    #
     # There is no method exclude default gems from the local gem list, for example: psych (default: 2.2.2),
-    #  but default gems should not be managed, by design.
+    # but default gems should not be managed (by design) by this or any provider.
+
     gem_list = sio_out.string.lines.reject { |gem| gem =~ / \(default\: / }
     gem_list.join("\n")
   ensure
