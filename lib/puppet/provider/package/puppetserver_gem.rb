@@ -127,27 +127,27 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
   def install(useversion = true)
     command = [command(:puppetservercmd), 'gem', 'install']
     command += install_options if resource[:install_options]
-    command << '-v' << resource[:ensure] if (! resource[:ensure].is_a? Symbol) and useversion
+    command << '-v' << resource[:ensure] if (!resource[:ensure].is_a? Symbol) && useversion
 
     if source = resource[:source]
       begin
         uri = URI.parse(source)
       rescue => detail
-        self.fail Puppet::Error, _("Invalid source '%{uri}': %{detail}") % { uri: uri, detail: detail }, detail
+        fail Puppet::Error, _("Invalid source '%{uri}': %{detail}") % { uri: uri, detail: detail }, detail
       end
 
       case uri.scheme
-        when nil
-          # no URI scheme => interpret the source as a local file
-          command << source
-        when /file/i
-          command << uri.path
-        when 'puppet'
-          # we don't support puppet:// URLs (yet)
-          raise Puppet::Error.new(_("puppet:// URLs are not supported as gem sources"))
-        else
-          # interpret it as a gem repository
-          command << '--source' << "#{source}" << resource[:name]
+      when nil
+        # no URI scheme => interpret the source as a local file
+        command << source
+      when /file/i
+        command << uri.path
+      when 'puppet'
+        # we don't support puppet:// URLs (yet)
+        raise Puppet::Error.new(_('puppet:// URLs are not supported as gem sources'))
+      else
+        # interpret it as a gem repository
+        command << '--source' << source << resource[:name]
       end
     else
       command << '--no-rdoc' << '--no-ri' << resource[:name]
@@ -155,7 +155,7 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
 
     output = execute(command, EXEC_OPTS)
     # Apparently, some gem versions don't exit non-0 on failure.
-    self.fail _("Could not install: %{output}") % { output: output.chomp } if output.include?('ERROR')
+    fail _("Could not install: %{output}") % { output: output.chomp } if output.include?('ERROR')
   end
 
   def uninstall
@@ -165,6 +165,6 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
 
     output = execute(command, EXEC_OPTS)
     # Apparently, some gem versions don't exit non-0 on failure.
-    self.fail _("Could not uninstall: %{output}") % { output: output.chomp } if output.include?('ERROR')
+    fail _("Could not uninstall: %{output}") % { output: output.chomp } if output.include?('ERROR')
   end
 end
