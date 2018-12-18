@@ -84,10 +84,10 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
   # but java platform gems should not be managed by this (or any) provider.
 
   def self.execute_rubygems_list_command(gem_regex)
-    puppetserver_gem_home            = '/opt/puppetlabs/server/data/puppetserver/jruby-gems'
-    puppetserver_vendored_jruby_gems = '/opt/puppetlabs/server/data/puppetserver/vendored-jruby-gems'
-    puppet_vendored_gems             = '/opt/puppetlabs/puppet/lib/ruby/vendor_gems'
-    puppetserver_gem_path = [puppetserver_gem_home, puppetserver_vendored_jruby_gems, puppet_vendored_gems]
+    puppetserver_default_gem_home            = '/opt/puppetlabs/server/data/puppetserver/jruby-gems'
+    puppetserver_default_vendored_jruby_gems = '/opt/puppetlabs/server/data/puppetserver/vendored-jruby-gems'
+    puppet_default_vendor_gems               = '/opt/puppetlabs/puppet/lib/ruby/vendor_gems'
+    puppetserver_default_gem_path = [puppetserver_default_gem_home, puppetserver_default_vendored_jruby_gems, puppet_default_vendor_gems].join(':')
 
     pe_puppetserver_conf_file = '/etc/puppetlabs/puppetserver/conf.d/pe-puppet-server.conf'
     os_puppetserver_conf_file = '/etc/puppetlabs/puppetserver/puppetserver.conf'
@@ -95,12 +95,12 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
     puppetserver_conf = Hocon.load(puppetserver_conf_file)
 
     gem_env = {}
-    if puppetserver_conf.empty?
-      gem_env['GEM_HOME'] = puppetserver_gem_home
-      gem_env['GEM_PATH'] = puppetserver_gem_path.join(':')
+    if puppetserver_conf.empty? || puppetserver_conf.key?('jruby-puppet') == false
+      gem_env['GEM_HOME'] = puppetserver_default_gem_home
+      gem_env['GEM_PATH'] = puppetserver_default_gem_path
     else
-      gem_env['GEM_HOME'] = puppetserver_conf['jruby-puppet']['gem-home']
-      gem_env['GEM_PATH'] = puppetserver_conf['jruby-puppet']['gem-path'].join(':')
+      gem_env['GEM_HOME'] = puppetserver_conf['jruby-puppet'].key?('gem-home') ? puppetserver_conf['jruby-puppet']['gem-home'] : puppetserver_default_gem_home
+      gem_env['GEM_PATH'] = puppetserver_conf['jruby-puppet'].key?('gem-path') ? puppetserver_conf['jruby-puppet']['gem-path'].join(':') : puppetserver_default_gem_path
     end
     gem_env['GEM_SPEC_CACHE'] = "/tmp/#{$$}"
     Gem.paths = gem_env
