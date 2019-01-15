@@ -17,41 +17,37 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
   has_feature :versionable, :install_options, :uninstall_options
 
   confine :feature => :hocon
-  commands :puppetservercmd => '/opt/puppetlabs/bin/puppetserver'
 
-  # The HOME variable is lost to the puppetserver script,
-  # and needs to be injected directly into the call to `execute()`
-  # When doing so, restore :failonfail and :combine to their defaults,
-  # as per the documentation in lib/puppet/util/execution.rb
-  EXEC_OPTS = {
-    :failonfail         => true,
-    :combine            => true,
-    :custom_environment => { :HOME => ENV['HOME'] }
-  }.freeze
+  # The gem command uses HOME to locate a gemrc file.
+  # CommandDefiner in provider.rb will set failonfail, combine, and environment.
+
+  has_command(:puppetservercmd, '/opt/puppetlabs/bin/puppetserver') do
+    environment(:HOME => ENV['HOME'])
+  end
 
   def self.gemlist(options)
-    gem_list_command = [command(:puppetservercmd), 'gem', 'list']
+    command_options = ['gem', 'list']
 
     if options[:local]
-      gem_list_command << '--local'
+      command_options << '--local'
     else
-      gem_list_command << '--remote'
+      command_options << '--remote'
     end
 
     if options[:source]
-      gem_list_command << "--source #{options[:source]}"
+      command_options << "--source #{options[:source]}"
     end
 
     if name = options[:justme]
       gem_regex = '\A' + name + '\z'
-      gem_list_command << gem_regex
+      command_options << gem_regex
     end
 
     if options[:local]
       list = execute_rubygems_list_command(gem_regex)
     else
       begin
-        list = execute(gem_list_command, EXEC_OPTS)
+        list = puppetservercmd(command_options)
       rescue Puppet::ExecutionFailure => detail
         raise Puppet::Error, _("Could not list gems: %{detail}") % { detail: detail }, detail.backtrace
       end
@@ -125,46 +121,49 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
   end
 
   def install(useversion = true)
-    command = [command(:puppetservercmd), 'gem', 'install']
-    command += install_options if resource[:install_options]
-    command << '-v' << resource[:ensure] if (!resource[:ensure].is_a? Symbol) && useversion
+    command_options = ['gem', 'install']
+    command_options += install_options if resource[:install_options]
+
+    command_options << '-v' << resource[:ensure] if (!resource[:ensure].is_a? Symbol) && useversion
+
+    command_options << '--no-document'
 
     if source = resource[:source]
       begin
         uri = URI.parse(source)
       rescue => detail
-        fail Puppet::Error, _("Invalid source '%{uri}': %{detail}") % { uri: uri, detail: detail }, detail
+        self.fail Puppet::Error, _("Invalid source '%{uri}': %{detail}") % { uri: uri, detail: detail }, detail
       end
 
       case uri.scheme
       when nil
         # no URI scheme => interpret the source as a local file
-        command << source
+        command_options << source
       when /file/i
-        command << uri.path
+        command_options << uri.path
       when 'puppet'
         # we don't support puppet:// URLs (yet)
         raise Puppet::Error.new(_('puppet:// URLs are not supported as gem sources'))
       else
         # interpret it as a gem repository
-        command << '--source' << source << resource[:name]
+        command_options << '--source' << "#{source}" << resource[:name]
       end
     else
-      command << '--no-rdoc' << '--no-ri' << resource[:name]
+      command_options << resource[:name]
     end
 
-    output = execute(command, EXEC_OPTS)
+    output = puppetservercmd(command_options)
     # Apparently, some gem versions don't exit non-0 on failure.
-    fail _("Could not install: %{output}") % { output: output.chomp } if output.include?('ERROR')
+    self.fail _("Could not install: %{output}") % { output: output.chomp } if output.include?('ERROR')
   end
 
   def uninstall
-    command = [command(:puppetservercmd), 'gem', 'uninstall']
-    command << '--executables' << '--all' << resource[:name]
-    command << uninstall_options if resource[:uninstall_options]
+    command_options = ['gem', 'uninstall']
+    command_options << '--executables' << '--all' << resource[:name]
+    command_options += uninstall_options if resource[:uninstall_options]
 
-    output = execute(command, EXEC_OPTS)
+    output = puppetservercmd(command_options)
     # Apparently, some gem versions don't exit non-0 on failure.
-    fail _("Could not uninstall: %{output}") % { output: output.chomp } if output.include?('ERROR')
+    self.fail _("Could not uninstall: %{output}") % { output: output.chomp } if output.include?('ERROR')
   end
 end
