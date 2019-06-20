@@ -18,6 +18,13 @@ Puppet::Type.type(:package).provide :puppetserver_gem, :parent => :gem do
 
   confine :feature => :hocon
 
+  # Define the default provider package command name, as the parent 'gem' provider is targetable.
+  # Required by Puppet::Provider::Package::Targetable::resource_or_provider_command
+
+  def self.provider_command
+    command(:puppetservercmd)
+  end
+
   # The gem command uses HOME to locate a gemrc file.
   # CommandDefiner in provider.rb will set failonfail, combine, and environment.
 
