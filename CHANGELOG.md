@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.1]
+### Summary
+Minor changes to gem documentation params.
+
+### Fixed
+- (FM-7681) puppetserver_gem - match gem documentation params
+
+
 ## [1.1.0]
 ### Summary
 This release includes minor documentation updates, a compatibility update which means this module is now compatible with Puppet versions less than 7.0.0 and finally a feature to accelerate the puppetserver_gem list.
@@ -43,6 +51,7 @@ optional, make sure that the puppetserver_gem is in the correct place
   cp -r /etc/puppet/modules/puppetserver_gem /etc/puppetlabs/code/environments/production/modules/
 /opt/puppetlabs/bin/puppet apply apply_manifest.pp.****  
 
+[1.1.0]: https://github.com/puppetlabs/puppetlabs-puppetserver_gem/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/puppetlabs/puppetlabs-puppetserver_gem/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/puppetlabs/puppetlabs-puppetserver_gem/compare/0.2.0...1.0.0
 [0.2.0]: https://github.com/puppetlabs/puppetlabs-puppetserver_gem/compare/0.1.0...0.2.0
