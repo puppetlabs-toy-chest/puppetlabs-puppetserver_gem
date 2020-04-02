@@ -1,7 +1,7 @@
 ---
 HOSTS:
   masterblaster:
-    pe_dir: http://neptune.puppetlabs.lan/2017.3/ci-ready
+    pe_dir: https://artifactory.delivery.puppetlabs.net/artifactory/generic_enterprise__local/2018.1/ci-ready/
     pe_ver:
     pe_upgrade_dir:
     pe_upgrade_ver:
