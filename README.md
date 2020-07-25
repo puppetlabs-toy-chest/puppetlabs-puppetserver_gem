@@ -66,7 +66,9 @@ https_proxy: http://proxy.megacorp.com:8888
 
 ## Limitations
 
-This module has been tested on PE and FOSS, and no issues have been identified. It is a wrapper around the `puppetserver gem` command line, and so has the same limitations around [Gems with native (C) extensions](https://docs.puppet.com/puppetserver/latest/gems.html#gems-with-native-c-extensions)
+This module has been tested on PE and FOSS. It is a wrapper around the `puppetserver gem` command line, and so has the same limitations around [Gems with native (C) extensions](https://docs.puppet.com/puppetserver/latest/gems.html#gems-with-native-c-extensions)
+
+Due to a change in Puppet, versions of this module prior to 1.1.1 are incompatible with versions of Puppet prior to 5.5.16 in the Puppet 5 series, 6.0.10 in the 6.0 series, and 6.4.3 in the 6.4 series. Related failures can raise "No command gemcmd defined for provider puppetserver_gem" errors during Puppet runs. To resolve the issue, ensure that version 1.1.1 of the module is installed. For details, see [PUP-6488](https://tickets.puppetlabs.com/browse/PUP-6488).
 
 ## Development
 
