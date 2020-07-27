@@ -1,6 +1,5 @@
 require 'facter'
 require 'rubygems/commands/list_command'
-require 'puppet/provider/package'
 require 'stringio'
 require 'uri'
 
