@@ -10,7 +10,7 @@ Minor changes to gem documentation params.
 
 ### Fixed
 - (FM-7681) puppetserver_gem - match gem documentation params
-
+- (PUP-6488) allow alternative gem command
 
 ## [1.1.0]
 ### Summary
